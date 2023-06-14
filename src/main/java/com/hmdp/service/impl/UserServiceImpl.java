@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -93,6 +94,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.expire(tokenKey,LOGIN_USER_TTL,TimeUnit.MINUTES);
         //8.返回token
         return Result.ok(token);
+    }
+
+    @Override
+    public Result logout() {
+        Set<String> keys = stringRedisTemplate.keys("login:" + "*");
+        for (String key : keys) {
+            stringRedisTemplate.delete(key);
+        }
+        return Result.ok("成功下线！");
     }
 
     private User createUserWithPhone(String phone) {
